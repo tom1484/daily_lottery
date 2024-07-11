@@ -6,6 +6,7 @@ WORKDIR /app
 # Copy the contents into the container at /app
 COPY ./requirements.txt ./
 COPY ./src/* ./
+COPY ./.env ./
 
 RUN pip3 install --no-cache-dir -r ./requirements.txt
 

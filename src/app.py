@@ -1,8 +1,10 @@
-import os
+import dotenv
+from linebot.v3.exceptions import InvalidSignatureError
+
+import lottery
 from flask import Flask, abort, request
 from flask_apscheduler import APScheduler
 from linebot.v3 import WebhookHandler
-from linebot.v3.exceptions import InvalidSignatureError
 from linebot.v3.messaging import (
     ApiClient,
     BroadcastRequest,
@@ -12,15 +14,14 @@ from linebot.v3.messaging import (
     TextMessage,
 )
 from linebot.v3.webhooks import MessageEvent, TextMessageContent
-import lottery
 
 app = Flask(__name__)
 scheduler = APScheduler()
 
 configuration = Configuration(
-    access_token=os.environ['CHANNEL_ACCESS_TOKEN']
+    access_token=dotenv.get_key(".env", "CHANNEL_ACCESS_TOKEN")
 )
-handler = WebhookHandler(os.environ['CHANNEL_SECRET'])
+handler = WebhookHandler(dotenv.get_key(".env", "CHANNEL_SECRET"))
 
 
 @app.route("/callback", methods=["POST"])
