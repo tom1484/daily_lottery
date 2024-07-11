@@ -1,3 +1,4 @@
+import os
 from flask import Flask, abort, request
 from flask_apscheduler import APScheduler
 from linebot.v3 import WebhookHandler
@@ -11,16 +12,15 @@ from linebot.v3.messaging import (
     TextMessage,
 )
 from linebot.v3.webhooks import MessageEvent, TextMessageContent
-
 import lottery
 
 app = Flask(__name__)
 scheduler = APScheduler()
 
 configuration = Configuration(
-    access_token="sRdmeIsFtWpRi89ardM+pPnT6QuonYhvjcE+4Mi3gAhBterF7PK9nXLOLb4SdrrDgljXeuhhWDmgCyuq3KZiRho/Oj4oOo/afuuSlSfBxSQEri/R1CdaoqLyQt0iIhezwjna+HVDoCCX+/B/9B1r2wdB04t89/1O/w1cDnyilFU="
+    access_token=os.environ['CHANNEL_ACCESS_TOKEN']
 )
-handler = WebhookHandler("5ad835024e10773d53a1eb19eb1ef6ec")
+handler = WebhookHandler(os.environ['CHANNEL_SECRET'])
 
 
 @app.route("/callback", methods=["POST"])
