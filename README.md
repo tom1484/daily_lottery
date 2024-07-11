@@ -1,1 +1,1 @@
-# daily_lottery
+# Daily Lottery
