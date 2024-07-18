@@ -57,8 +57,8 @@ def callback():
 #         )
 
 
-# @scheduler.task("cron", id="push_statistics_update", day="*", hour="9")
-@scheduler.task("interval", id="push_statistics_update", seconds=10)
+@scheduler.task("cron", id="push_statistics_update", day="*", hour="9")
+# @scheduler.task("interval", id="push_statistics_update", seconds=10)
 def push_statistics_update():
     count = lottery.update_history()
     if count == 0:
