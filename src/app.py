@@ -65,12 +65,14 @@ def push_statistics_update():
         return
 
     statistics = lottery.extract_statistics()
+    messages = []
+
     message = ""
 
     # Two-digit missing numbers
     missings = statistics["missings"]
 
-    message += "前兩位缺號：\n"
+    message = "前兩位缺號：\n"
 
     n = len(missings[0])
     for i, number in enumerate(missings[0]):
@@ -87,9 +89,12 @@ def push_statistics_update():
         if i % 5 == 4 and i != n - 1:
             message += "\n"
 
+    messages.append(message)
+
     with ApiClient(configuration) as api_client:
-        line_bot_api = MessagingApi(api_client)
-        line_bot_api.broadcast(BroadcastRequest(messages=[TextMessage(text=message)]))
+        for message in messages:
+            line_bot_api = MessagingApi(api_client)
+            line_bot_api.broadcast(BroadcastRequest(messages=[TextMessage(text=message)]))
 
 
 if __name__ == "__main__":
