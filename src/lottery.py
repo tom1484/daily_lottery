@@ -1,6 +1,7 @@
 import os
 import time
 from typing import Any, Dict, List, Tuple
+from operator import itemgetter
 
 import pandas as pd
 import requests
@@ -94,14 +95,14 @@ def extract_statistics(n: int = 200) -> Dict[str, Any]:
     history.sort_values(by=["year", "month"], inplace=True)
     history = history.tail(n)
 
-    # lines = []
-    # for _, row in history.iterrows():
-    #     # lines.append(f"{row['year']}-{row['month']:02d} {row['period']} {row['number']}")
-    #     lines.append(f"{row['period']} {row['number']}")
-    #
-    # return "\n".join(lines)
-
     statistics = {}
+
+    # Put all records
+    history_rows = [(row["period"], row["number"]) for _, row in history.iterrows()]
+    history_rows.sort(key=itemgetter(0))
+    records = [f"{period} {number}" for period, number in history_rows]
+
+    statistics["records"] = records
 
     # Calculate two-digit missing numbers
     missings = [[], []]

@@ -57,8 +57,8 @@ def callback():
 #         )
 
 
-@scheduler.task("cron", id="push_statistics_update", day="*", hour="9")
-# @scheduler.task("interval", id="push_statistics_update", seconds=10)
+# @scheduler.task("cron", id="push_statistics_update", day="*", hour="9")
+@scheduler.task("interval", id="push_statistics_update", seconds=10)
 def push_statistics_update():
     count = lottery.update_history()
     if count == 0:
@@ -67,7 +67,11 @@ def push_statistics_update():
     statistics = lottery.extract_statistics()
     messages = []
 
-    message = ""
+    # All records
+    records = statistics["records"]
+    message = "\n".join(records)
+
+    messages.append(message)
 
     # Two-digit missing numbers
     missings = statistics["missings"]
@@ -83,7 +87,7 @@ def push_statistics_update():
     message += "\n\n"
     message += "後兩位缺號：\n"
 
-    n = len(missings[0])
+    n = len(missings[1])
     for i, number in enumerate(missings[1]):
         message += f"{number:02d} "
         if i % 5 == 4 and i != n - 1:
