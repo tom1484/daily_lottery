@@ -45,30 +45,51 @@ def callback():
     return "OK"
 
 
-@handler.add(MessageEvent, message=TextMessageContent)
-def handle_message(event):
-    with ApiClient(configuration) as api_client:
-        # line_bot_api = MessagingApi(api_client)
-        # line_bot_api.reply_message_with_http_info(
-        #     ReplyMessageRequest(
-        #         reply_token=event.reply_token,
-        #         messages=[TextMessage(text=event.message.text)],
-        #     )
-        # )
-        pass
+# @handler.add(MessageEvent, message=TextMessageContent)
+# def handle_message(event):
+#     with ApiClient(configuration) as api_client:
+#         line_bot_api = MessagingApi(api_client)
+#         line_bot_api.reply_message_with_http_info(
+#             ReplyMessageRequest(
+#                 reply_token=event.reply_token,
+#                 messages=[TextMessage(text=event.message.text)],
+#             )
+#         )
 
 
-@scheduler.task("cron", id="push_history_update", day="*", hour="12")
-# @scheduler.task("interval", id="push_history_update", seconds=10)
-def push_history_update():
-    count = lottery.update()
+@scheduler.task("cron", id="push_statistics_update", day="*", hour="9")
+# @scheduler.task("interval", id="push_statistics_update", seconds=10)
+def push_statistics_update():
+    count = lottery.update_history()
     if count == 0:
         return
 
-    history = lottery.extract()
+    statistics = lottery.extract_statistics()
+    message = ""
+
+    # Two-digit missing numbers
+    missings = statistics["missings"]
+
+    message += "前兩位缺號：\n"
+
+    n = len(missings[0])
+    for i, number in enumerate(missings[0]):
+        message += f"{number:02d} "
+        if i % 5 == 4 and i != n - 1:
+            message += "\n"
+
+    message += "\n\n"
+    message += "後兩位缺號：\n"
+
+    n = len(missings[0])
+    for i, number in enumerate(missings[1]):
+        message += f"{number:02d} "
+        if i % 5 == 4 and i != n - 1:
+            message += "\n"
+
     with ApiClient(configuration) as api_client:
         line_bot_api = MessagingApi(api_client)
-        line_bot_api.broadcast(BroadcastRequest(messages=[TextMessage(text=history)]))
+        line_bot_api.broadcast(BroadcastRequest(messages=[TextMessage(text=message)]))
 
 
 if __name__ == "__main__":

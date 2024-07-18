@@ -1,6 +1,6 @@
 import os
 import time
-from typing import Dict, List, Tuple
+from typing import Any, Dict, List, Tuple
 
 import pandas as pd
 import requests
@@ -39,7 +39,7 @@ def append_history(
     history["number"].append("".join(map(str, numbers)))
 
 
-def update():
+def update_history():
     localtime = time.localtime()
     current_year = localtime.tm_year
     current_month = localtime.tm_mon
@@ -86,7 +86,7 @@ def update():
     return new_history_count
 
 
-def extract(n: int = 200):
+def extract_statistics(n: int = 200) -> Dict[str, Any]:
     history = pd.read_csv(
         "history.csv", dtype={"year": int, "month": int, "period": int, "number": str}
     )
@@ -94,9 +94,26 @@ def extract(n: int = 200):
     history.sort_values(by=["year", "month"], inplace=True)
     history = history.tail(n)
 
-    lines = []
-    for _, row in history.iterrows():
-        # lines.append(f"{row['year']}-{row['month']:02d} {row['period']} {row['number']}")
-        lines.append(f"{row['period']} {row['number']}")
+    # lines = []
+    # for _, row in history.iterrows():
+    #     # lines.append(f"{row['year']}-{row['month']:02d} {row['period']} {row['number']}")
+    #     lines.append(f"{row['period']} {row['number']}")
+    #
+    # return "\n".join(lines)
 
-    return "\n".join(lines)
+    statistics = {}
+
+    # Calculate two-digit missing numbers
+    missings = [[], []]
+    highs = set([int(row["number"][:2]) for _, row in history.iterrows()])
+    lows = set([int(row["number"][2:]) for _, row in history.iterrows()])
+
+    for i in range(100):
+        if i not in highs:
+            missings[0].append(i)
+        if i not in lows:
+            missings[1].append(i)
+
+    statistics["missings"] = missings
+
+    return statistics
