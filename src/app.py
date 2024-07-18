@@ -1,10 +1,8 @@
 import dotenv
-from linebot.v3.exceptions import InvalidSignatureError
-
-import lottery
 from flask import Flask, abort, request
 from flask_apscheduler import APScheduler
 from linebot.v3 import WebhookHandler
+from linebot.v3.exceptions import InvalidSignatureError
 from linebot.v3.messaging import (
     ApiClient,
     BroadcastRequest,
@@ -14,6 +12,8 @@ from linebot.v3.messaging import (
     TextMessage,
 )
 from linebot.v3.webhooks import MessageEvent, TextMessageContent
+
+import lottery
 
 app = Flask(__name__)
 scheduler = APScheduler()
@@ -58,7 +58,7 @@ def handle_message(event):
         pass
 
 
-@scheduler.task("cron", id="push_history_update", day="*", hour="12", minute="0")
+@scheduler.task("cron", id="push_history_update", day="*", hour="12")
 # @scheduler.task("interval", id="push_history_update", seconds=10)
 def push_history_update():
     count = lottery.update()
