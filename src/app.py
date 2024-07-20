@@ -1,4 +1,5 @@
 import dotenv
+import datetime as dt
 from flask import Flask, abort, request
 from flask_apscheduler import APScheduler
 from linebot.v3 import WebhookHandler
@@ -22,6 +23,8 @@ configuration = Configuration(
     access_token=dotenv.get_key(".env", "CHANNEL_ACCESS_TOKEN")
 )
 handler = WebhookHandler(dotenv.get_key(".env", "CHANNEL_SECRET"))
+
+tz_taipei = dt.timezone(dt.timedelta(hours=8))
 
 
 @app.route("/callback", methods=["POST"])
@@ -57,7 +60,7 @@ def callback():
 #         )
 
 
-@scheduler.task("cron", id="push_statistics_update", day="*", hour="9")
+@scheduler.task("cron", id="push_statistics_update", day="*", hour="21")
 # @scheduler.task("interval", id="push_statistics_update", seconds=10)
 def push_statistics_update():
     count = lottery.update_history()
